@@ -157,30 +157,110 @@
       nasa_data_last_retrieved:latestNasa};
     downloadFile('astrobyte-health-report.json',JSON.stringify(report,null,2),'application/json');showToast('Health snapshot downloaded');
   }
-  function renderNasaPreview(data){
-    $('nasaStatusTitle').textContent='NASA RadLab response received';
-    const count=Number(data.record_count)||0;
-    $('nasaStatusText').textContent=`Retrieved ${count} historical ISS radiation record${count===1?'':'s'} for the documented 2022 example window. These are environmental readings, not astronaut vital signs; they do not replace the simulated radiation slider.`;
-    const box=$('nasaResponse');box.hidden=false;
-    const sample=data.sample||null;
-    const metadata=`Records: ${count}\nInstrument: ISS / DosTel\nPeriod: 2022-04-01 23:00 to 2022-04-02 01:05 (historical)\nSource: NASA OSDR RadLab API`;
-    box.textContent=metadata+(sample?'\n\nSample record:\n'+JSON.stringify(sample,null,2):'\n\nNo sample record returned.');
-    const series=Array.isArray(data.radiation_series)?data.radiation_series.filter(p=>Number.isFinite(Number(p.dose_rate_uGy_h))):[];
-    $('nasaChartWrap').hidden=series.length<2;
-    if(series.length>=2)drawNasaSeries(series);
-    latestNasa={record_count:count,source_url:data.source_url||'',sample:sample,series_points:series.length,retrieved_at:new Date().toISOString()};
-  }
-  function drawNasaSeries(points){
-    const canvas=$('nasaChart'),width=500,height=155,scale=Math.min(window.devicePixelRatio||1,2);
-    canvas.width=width*scale;canvas.height=height*scale;const ctx=canvas.getContext('2d');
-    ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,width,height);
-    const numbers=points.map(p=>Number(p.dose_rate_uGy_h));const lo=Math.min(...numbers),hi=Math.max(...numbers),span=Math.max(.0001,hi-lo);
-    const pad=20,x=i=>pad+i*(width-2*pad)/Math.max(1,points.length-1),y=n=>height-pad-(n-lo)/span*(height-2*pad);
-    ctx.strokeStyle='rgba(158,195,230,.12)';ctx.lineWidth=1;
-    for(let i=1;i<=3;i++){const row=height/4*i;ctx.beginPath();ctx.moveTo(pad,row);ctx.lineTo(width-pad,row);ctx.stroke();}
-    ctx.strokeStyle='#56e5cc';ctx.lineWidth=3;ctx.beginPath();numbers.forEach((n,i)=>i?ctx.lineTo(x(i),y(n)):ctx.moveTo(x(i),y(n)));ctx.stroke();
-    ctx.fillStyle='#b1cbe2';ctx.font='11px system-ui';ctx.fillText(`${lo.toFixed(2)}–${hi.toFixed(2)} µGy/h · ${numbers.length} historical samples`,16,13);
-  }
+
+    function renderNasaPreview(data) {
+      $('nasaStatusTitle').textContent = 'NASA RadLab response received';
+      const count = Number(data.record_count) || 0;
+      const sample = data.sample || null;
+      $('nasaStatusText').textContent =
+        `Retrieved ${count} historical ISS radiation records. ` +
+        'These are environmental measurements, not astronaut vital signs.';
+      const series = Array.isArray(data.radiation_series)
+        ? data.radiation_series.filter(p =>
+            Number.isFinite(Number(p.dose_rate_uGy_h)))
+        : [];
+      const box = $('nasaResponse');
+      box.innerHTML = `
+        <div class="nasa-summary-heading">
+          <strong>NASA Data Summary</strong>
+          <span>Historical data</span>
+        </div>
+        <div class="nasa-summary-grid">
+          <div>
+            <small>Records Retrieved</small>
+            <strong id="nasaRecordCount"></strong>
+          </div>
+          <div>
+            <small>Chart Samples</small>
+            <strong id="nasaSamplesCount"></strong>
+          </div>
+          <div>
+            <small>Spacecraft</small>
+            <strong>ISS</strong>
+          </div>
+          <div>
+            <small>Instrument</small>
+            <strong>DosTel</strong>
+          </div>
+        </div>
+        <div class="nasa-summary-period">
+          <small>Observation Period</small>
+          <span id="nasaObservationPeriod"></span>
+        </div>
+        <p class="nasa-summary-source">
+          Source: NASA OSDR RadLab API
+        </p>
+        <p class="nasa-summary-note">
+          Historical environmental measurements,
+          not live astronaut health data.
+        </p>
+      `;
+      $('nasaRecordCount').textContent = count.toLocaleString();
+      $('nasaSamplesCount').textContent = series.length.toLocaleString();
+      $('nasaObservationPeriod').textContent =
+        String(data.period || 'Historical sample')
+          .replaceAll('T', ' ')
+          .replace(' through ', ' – ');
+      box.hidden = false;
+      $('nasaChartWrap').hidden = series.length < 2;
+      if (series.length >= 2) {
+        drawNasaSeries(series);
+      }
+      latestNasa = {
+        record_count: count,
+        source_url: data.source_url || '',
+        sample: sample,
+        series_points: series.length,
+        retrieved_at: new Date().toISOString()
+      };
+    }
+
+    function drawNasaSeries(points) {
+        const canvas = $('nasaChart');
+        const width = 500, height = 155;
+        const scale = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+        const numbers = points.map(p => Number(p.dose_rate_uGy_h));
+        const lo = Math.min(...numbers);
+        const hi = Math.max(...numbers);
+        const span = Math.max(0.0001, hi - lo);
+        const pad = 20;
+        const x = i => pad + i * (width - 2 * pad) / Math.max(1, points.length - 1);
+        const y = n => height - pad - (n - lo) / span * (height - 2 * pad);
+        ctx.strokeStyle = 'rgba(158,195,230,.12)';
+        ctx.lineWidth = 1;
+        for (let i = 1; i <= 3; i++) {
+            const row = height / 4 * i;
+            ctx.beginPath();
+            ctx.moveTo(pad, row);
+            ctx.lineTo(width - pad, row);
+            ctx.stroke();
+        }
+        ctx.strokeStyle = '#56e5cc';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        numbers.forEach((n, i) =>
+            i ? ctx.lineTo(x(i), y(n)) : ctx.moveTo(x(i), y(n))
+        );
+        ctx.stroke();
+        $('nasaChartMeta').textContent =
+            `${lo.toFixed(2)}–${hi.toFixed(2)} µGy/h · ${numbers.length} historical samples`;
+    }
+
   async function loadNasa(){
     const btn=$('nasaBtn');btn.disabled=true;btn.textContent='Checking NASA…';
     try{
