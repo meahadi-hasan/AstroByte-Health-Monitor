@@ -1600,6 +1600,7 @@ button:disabled {
     transition: none!important;
   }
 }
+
 .nasa-chart-wrap {
   margin-top: 14px;
   border: 1px solid rgba(70,224,202,.25);
@@ -1621,4 +1622,226 @@ button:disabled {
   width: 100%;
   height: 155px;
   display: block;
+}
+
+
+.nasa-summary {
+  margin-top: 14px;
+  padding: 16px;
+  background: #061528;
+  border: 1px solid rgba(81, 206, 222, .22);
+  border-radius: 12px;
+  color: #dceefa;
+}
+
+.nasa-summary[hidden] {
+  display: none;
+}
+
+.nasa-summary-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nasa-summary-heading strong {
+  font-size: 15px;
+}
+
+.nasa-summary-heading span {
+  color: #9ce7d9;
+  background: rgba(86, 229, 204, .08);
+  border: 1px solid rgba(86, 229, 204, .25);
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+.nasa-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.nasa-summary-grid > div {
+  min-width: 0;
+  padding: 10px 12px;
+  background: rgba(22, 48, 75, .7);
+  border: 1px solid rgba(133, 189, 220, .13);
+  border-radius: 9px;
+}
+
+.nasa-summary-grid small,
+.nasa-summary-period small {
+  display: block;
+  color: #93afc6;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.nasa-summary-grid strong {
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.nasa-summary-period {
+  margin-top: 16px;
+}
+
+.nasa-summary-period span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.nasa-summary-source {
+  color: #9bbdd0;
+  font-size: 12px;
+  margin: 10px 0 0;
+}
+
+.nasa-summary-note {
+  border-top: 1px solid rgba(133, 189, 220, .13);
+  margin: 13px 0 0;
+  padding-top: 11px;
+  color: #93afc6;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+#nasa-data #nasaResponse {
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    font-family: inherit !important;
+    min-width: 0;
+    height: auto;
+    align-self: start;
+}
+
+#nasa-data #nasaResponse[hidden] {
+    display: none !important;
+}
+
+#nasa-data .nasa-summary p {
+    min-height: 0;
+    margin: 10px 0 0;
+    line-height: 1.6;
+}
+
+@media (min-width: 981px) {
+
+    #nasa-data .data-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    #nasa-data .live-card {
+        grid-column: 1 / -1;
+
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        column-gap: 18px;
+        row-gap: 12px;
+        align-content: start;
+    }
+
+    #nasa-data .live-card > .source-badge,
+    #nasa-data .live-card > h3,
+    #nasa-data .live-card > p,
+    #nasa-data .live-card > .mini-code {
+        grid-column: 1 / -1;
+    }
+
+    #nasa-data .live-card > .source-badge {
+        justify-self: start;
+    }
+
+    #nasa-data .live-card > h3 {
+        margin: 0;
+    }
+
+    #nasa-data .live-card > p {
+        margin: 0;
+        min-height: 0;
+    }
+
+    #nasa-data .live-card > .mini-code {
+        margin: 0;
+    }
+
+    #nasa-data .live-card > .nasa-chart-wrap {
+        grid-column: 1;
+        margin-top: 4px;
+        min-width: 0;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #nasa-data .live-card > .nasa-chart-wrap[hidden] {
+        display: none;
+    }
+
+    #nasa-data .nasa-chart-wrap canvas {
+        margin-top: 0;
+        flex-shrink: 0;
+    }
+
+
+
+    #nasa-data .live-card > #nasaResponse {
+        grid-column: 2;
+        margin-top: 4px;
+    }
+}
+
+@media (max-width: 980px) {
+
+    #nasa-data .data-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #nasa-data .live-card {
+        display: block;
+    }
+
+    #nasa-data .live-card > .nasa-chart-wrap,
+    #nasa-data .live-card > #nasaResponse {
+        margin-top: 14px;
+    }
+}
+
+    #nasa-data .nasa-chart-labels span {
+        display: block;
+        margin: 0 0 5px;
+        font-size: 10px;
+        line-height: 1.4;
+        color: #96c6bc;
+    }
+
+    #nasa-data .nasa-chart-labels span:last-child {
+        margin-bottom: 0;
+        font-size: 11px;
+        color: #b1cbe2;
+    }
+
+@media (min-width: 981px) {
+
+    #nasa-data .nasa-chart-wrap {
+        position: relative;
+    }
+
+    #nasa-data .nasa-chart-labels {
+        position: absolute;
+        top: 15px;
+        left: 12px;
+        right: 12px;
+    }
 }
